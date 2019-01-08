@@ -15,54 +15,31 @@ sheetCompra = compra.active
 sheetModel = model.get_sheet_by_name('Carga de Datos')
 
 def codigoDeComprobante (tipo, varToTrim):
-    if (tipo is 'FFC'):
-        if (varToTrim [:1] is 'A'):
-            return tipoComprobante ['FCC']['A']
-        elif (varToTrim [:1] is 'B'):
-            return tipoComprobante ['FCC']['B']
-        elif (varToTrim [:1] is 'C'):
-            return tipoComprobante ['FCC']['C']
-
-    if (tipo is 'NCC'):
-        if (varToTrim [:1] is 'A'):
-            return tipoComprobante ['NCC']['A']
-        elif (varToTrim [:1] is 'B'):
-            return tipoComprobante ['NCC']['B']
-        elif (varToTrim [:1] is 'C'):
-            return tipoComprobante ['NCC']['C']
-
-    if (tipo is 'NDC'):
-        if (varToTrim [:1] is 'A'):
-            return tipoComprobante ['NDC']['A']
-        elif (varToTrim [:1] is 'B'):
-            return tipoComprobante ['NDC']['B']
-        elif (varToTrim [:1] is 'C'):
-            return tipoComprobante ['NDC']['C']
-
-    if (tipo is 'REC'):
-        if (varToTrim [:1] is 'A'):
-            return tipoComprobante ['REC']['A']
-        elif (varToTrim [:1] is 'B'):
-            return tipoComprobante ['REC']['B']
-        elif (varToTrim [:1] is 'C'):
-            return tipoComprobante ['REC']['C']
-
-    return "Nada"
+    if (tipo in tipoComprobante):
+        if (varToTrim [:1] in tipoComprobante [tipo]):
+            return tipoComprobante [tipo][varToTrim [:1]]
+        elif (varToTrim [:1] is '0'):
+            return tipoComprobante [tipo]['B']
+        elif (tipo is 'REC'):
+            return tipoComprobante [tipo]['C']  
+        else:
+            return 'XXX'
 
 def ptoDeVenta (varToTrim):
     return varToTrim [1:5].split("-")[0]
 
 def nroComprobante (varToTrim):
-    return varToTrim [6:14].split("/")[0]
+    varAux = varToTrim.split("-")[1]
+    varAux2 = varAux.split ("/")[0]
+    return varAux2
 
 def cuit (idComprobante):
     auxString = idComprobante [:2] + idComprobante [3:11] + idComprobante [12:13]
     return auxString
 
-#Se resta 7 en el for porque la planilla de Compras tiene 7 filas semi-completas que no se usan.
-for i in range (sheetCompra.max_row-7):
-    #Copia celda a celda. Las primeras 4
-
+#Se resta 8 en el for porque la planilla de Compras tiene 8 filas semi-completas que no se usan.
+for i in range (sheetCompra.max_row-8):
+    
     #Copia fecha
     sheetModel.cell (row = 13+i, column = 1).value = sheetCompra.cell (row=2+i, column = 1).value
     aux = str (sheetCompra.cell (row=2+i, column = 2).value)
@@ -74,6 +51,6 @@ for i in range (sheetCompra.max_row-7):
     sheetModel.cell (row = 13+i, column = 3).value = ptoDeVenta (aux2)
     sheetModel.cell (row = 13+i, column = 4).value = nroComprobante (aux2)
     sheetModel.cell (row = 13+i, column = 7).value = cuit (aux3)
-    sheetModel.cell (row = 13+i, column = 8).value = sheetCompra.cell (row=1+i, column = 6).value
+    sheetModel.cell (row = 13+i, column = 8).value = sheetCompra.cell (row=2+i, column = 6).value
 
 model.save ('MODELO DE FORMULARIO.xlsx')
